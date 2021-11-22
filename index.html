@@ -2,10 +2,20 @@
 <html lang="en">
 
 <head>
+  
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Lab 9</title>
+
+  <!--Track JS Agent-->
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+    window.TrackJS && TrackJS.install({ 
+      token: "6cfdb1537b264f0db83586eefbb1dfab"
+      // for more configuration options, see https://docs.trackjs.com
+    });
+  </script>
 
   <style>
     button {
@@ -46,6 +56,19 @@
       padding: 8px 2px;
       width: 122px;
     }
+    #demo-btns {
+      column-gap: 5px;
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 30px;
+      row-gap: 5px;
+    }
+    #demo-btns>* {
+      padding: 8px 2px;
+      width: 122px;
+      background-color: aqua;
+    }
+
   </style>
 </head>
 
@@ -85,6 +108,10 @@
       <button>Console Trace</button>
       <button>Trigger a Global Error</button>
     </section>
+    <section id="demo-btns">
+      <button>Try/Catch</button>
+      <button>Custom Error</button>
+    </section>
   </main>
 
   <script>
@@ -99,9 +126,132 @@
     });
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
-
+    let demoBtns = Array.from(document.querySelectorAll('#demo-btns > button'));
     // Start your code here
     // You may move this JS to another file if you wish
+    errorBtns[0].addEventListener('click', function(){
+        console.log('Console log demo');
+    });
+    errorBtns[1].addEventListener('click', function(){
+        console.error("Console error demo");
+    });
+    errorBtns[2].addEventListener('click', function(){
+        console.count("Console count demo");
+    });
+    errorBtns[3].addEventListener('click', function(){
+        console.warn("Warning!");
+    });
+    errorBtns[4].addEventListener('click', function(){
+        const x = 2;
+        const y = 5;
+        const reason = 'x is expected to be greater than y';
+        console.assert(x > y, {x, y, reason});
+    });
+    errorBtns[5].addEventListener('click', function(){
+        console.clear();
+    });
+    errorBtns[6].addEventListener('click', function(){
+        console.dir(document.querySelectorAll('#error-btns > button')[6]);
+    });
+    errorBtns[7].addEventListener('click', function(){
+        console.dirxml(document.querySelectorAll('#error-btns > button')[7]);
+    });
+    errorBtns[8].addEventListener('click', function(){
+      console.group('Names');
+      console.info('Dominik');
+      console.info('Stan');
+      console.info('Lucas');
+      console.info('Phillip');
+    });
+    errorBtns[9].addEventListener('click', function(){
+        console.groupEnd('Names');
+    });
+    errorBtns[10].addEventListener('click', function(){
+      console.table([
+      {
+        first: 'Joe',
+        last: 'Schmoe',
+        phone: '555-555-5555'
+      },
+      {
+        first: 'Michael',
+        last: 'Evans',
+        birthday: '18930113',
+      },
+      {
+        first: 'Chris',
+        last: 'Johnson',
+      }
+    ]);
+    });
+    errorBtns[11].addEventListener('click', function(){
+        console.time();
+    });
+    errorBtns[12].addEventListener('click', function(){
+        console.timeEnd();
+    });
+    errorBtns[13].addEventListener('click', function(){
+      const first = () => { second(); };
+      const second = () => { third(); };
+      const third = () => { fourth(); };
+      const fourth = () => { console.trace(); };
+      first();
+    });
+    
+    errorBtns[14].addEventListener('click', function(){
+      // Attaching an event to a button that doesn't exist
+      errorBtns[15].addEventListener('click', function(){
+        console.time();
+      });
+    });
+    
+    // try/catch demo
+    demoBtns[0].addEventListener('click', function(){
+      try{
+       
+        demoBtns[3].addEventListener('click', function(){
+          console.time();
+        });
+      } catch(err){
+        console.info(err.message);
+      }
+      finally{
+        console.info("After message is caught.");
+      }
+    });
+
+    // custom error type
+    class InputError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "InputError";
+      }
+    }
+    demoBtns[1].addEventListener('click', function(){
+      try{
+        let number = prompt("Enter a number > 0 :");
+        if(number < 0){
+          throw new InputError("Negative numbers are not allowed.");
+        }
+        if(number == 0){
+          throw new InputError("Zero is not allowed.");
+        }
+      }
+      catch(err){
+        if(err instanceof InputError){
+          console.info("Caught custom input error: " + err.message);
+        }
+        else{
+          throw err;
+        }
+      }
+    });
+
+    // Global error handler
+    window.addEventListener('error', function(err){
+      console.info("Caught Global error: " + err.message);
+    });
+
   </script>
 </body>
 
